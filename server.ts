@@ -15,17 +15,19 @@ async function startServer() {
 
   // Request logger
   app.use((req, res, next) => {
-    console.log(`[API LOG] ${req.method} ${req.url}`);
+    console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
     next();
   });
 
-  // Health Check
+  // Health Check - Moving to top
   app.get('/api/health', (req, res) => {
-    res.json({ status: 'ok', time: new Date().toISOString() });
+    console.log('Health check requested');
+    res.json({ status: 'ok', environment: process.env.NODE_ENV || 'development' });
   });
 
-  // API Routes
+  // API Routes (ALWAYS BEFORE VITE)
   app.post('/api/notion/validate', async (req, res) => {
+    console.log('Validating Notion connection...');
     const { token, databaseId } = req.body;
     if (!token || !databaseId) {
       return res.status(400).json({ error: 'Missing token or databaseId' });
