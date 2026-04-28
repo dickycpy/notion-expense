@@ -13,6 +13,17 @@ async function startServer() {
 
   app.use(express.json());
 
+  // Request logger
+  app.use((req, res, next) => {
+    console.log(`[API LOG] ${req.method} ${req.url}`);
+    next();
+  });
+
+  // Health Check
+  app.get('/api/health', (req, res) => {
+    res.json({ status: 'ok', time: new Date().toISOString() });
+  });
+
   // API Routes
   app.post('/api/notion/validate', async (req, res) => {
     const { token, databaseId } = req.body;
