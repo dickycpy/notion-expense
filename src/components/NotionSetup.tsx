@@ -82,8 +82,25 @@ export function NotionSetup({ userId, onSaved, initialConfig }: NotionSetupProps
               <li>複製 <span className="bg-white px-1 rounded border border-indigo-100 italic">Internal Integration Token</span> (通常以 secret_ 開頭)。</li>
               <li>在 Notion 中建立一個具備 <span className="font-bold italic">Name, Amount (Number), Category (Select), Date</span> 屬性的資料庫。</li>
               <li>在資料庫右上角「...」 → 「Add connections」搜尋並加入您的 Integration。</li>
-              <li>點擊網頁版資料庫「Copy link」，ID 位於域名後、問號前：<br/><span className="text-[10px] font-mono bg-indigo-100/50 px-1 italic">...notion.so/<b>[32_CHAR_ID]</b>?v=...</span><br/>(注意：ID 是一串長度為 32 的字母與數字組成)</li>
+              <li>點擊網頁版資料庫「Copy link」，ID 是網址中 `notion.so/` 之後那一串 32 位元的字串。<br/><span className="text-[10px] font-mono bg-indigo-100/50 px-1 italic">...notion.so/<b>[32_位元_ID]</b>?v=...</span></li>
             </ol>
+            <div className="pt-2">
+              <button 
+                type="button"
+                onClick={async () => {
+                  try {
+                    const r = await fetch('/api/health');
+                    const d = await r.json();
+                    alert(`伺服器連線正常: ${d.status}`);
+                  } catch (e) {
+                    alert('伺服器連線異常，請重新整理頁面');
+                  }
+                }}
+                className="text-[10px] bg-white px-2 py-1 rounded border border-indigo-200"
+              >
+                檢查伺服器狀態
+              </button>
+            </div>
           </div>
         </div>
       </div>
