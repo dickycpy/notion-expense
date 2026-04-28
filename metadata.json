@@ -1,0 +1,6 @@
+{
+  "name": "Notion 記帳助手 (Notion Expense Tracker)",
+  "description": "A polished bookkeeping app that syncs directly with your Notion database, featuring Google Authentication for seamless cross-device access.",
+  "requestFramePermissions": [],
+  "majorCapabilities": []
+}

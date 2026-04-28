@@ -1,0 +1,30 @@
+{
+  "entities": {
+    "UserConfig": {
+      "title": "User Configuration",
+      "description": "Stores Notion API key and database ID for a user",
+      "type": "object",
+      "properties": {
+        "notionApiKey": {
+          "type": "string",
+          "description": "The Notion Integration Token"
+        },
+        "notionDatabaseId": {
+          "type": "string",
+          "description": "The ID of the Notion database used for bookkeeping"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["notionApiKey", "notionDatabaseId"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "UserConfig",
+      "description": "User's Notion connection settings"
+    }
+  }
+}

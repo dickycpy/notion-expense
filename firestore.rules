@@ -1,0 +1,39 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Default deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function isValidUserConfig(data) {
+      return data.keys().hasAll(['notionApiKey', 'notionDatabaseId', 'updatedAt'])
+             && data.keys().size() == 3
+             && data.notionApiKey is string && data.notionApiKey.size() <= 256
+             && data.notionDatabaseId is string && data.notionDatabaseId.size() <= 128
+             && data.updatedAt is timestamp;
+    }
+
+    match /users/{userId} {
+      allow get: if isOwner(userId) && isValidId(userId);
+      allow create: if isOwner(userId) && isValidId(userId) && isValidUserConfig(request.resource.data);
+      allow update: if isOwner(userId) && isValidId(userId) && isValidUserConfig(request.resource.data)
+                    && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['notionApiKey', 'notionDatabaseId', 'updatedAt']);
+      allow delete: if isOwner(userId) && isValidId(userId);
+    }
+  }
+}
