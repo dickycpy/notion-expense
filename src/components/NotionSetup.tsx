@@ -33,7 +33,15 @@ export function NotionSetup({ userId, onSaved, initialConfig }: NotionSetupProps
         body: JSON.stringify({ token: apiKey, databaseId: dbId }),
       });
 
-      const data = await res.json();
+      const contentType = res.headers.get('content-type');
+      let data;
+      if (contentType && contentType.includes('application/json')) {
+        data = await res.json();
+      } else {
+        const text = await res.text();
+        throw new Error(`伺服器傳回非 JSON 回應 (${res.status}): ${text.substring(0, 50)}...`);
+      }
+
       if (!res.ok) throw new Error(data.error || '驗證失敗，請檢查 Token 與 ID');
 
       await saveUserConfig(userId, {
@@ -71,10 +79,10 @@ export function NotionSetup({ userId, onSaved, initialConfig }: NotionSetupProps
             <p className="font-bold text-sm uppercase tracking-wider">設定指南</p>
             <ol className="list-decimal ml-4 space-y-1.5 font-medium leading-relaxed">
               <li>造訪 <a href="https://www.notion.so/my-integrations" target="_blank" className="underline font-bold">Notion Integrations</a> 建立新 Integration。</li>
-              <li>複製 <span className="bg-white px-1 rounded border border-indigo-100">Internal Integration Token</span>。</li>
-              <li>在 Notion 中建立包含 <span className="font-bold italic">Name, Amount (Number), Category (Select), Date</span> 的資料庫。</li>
-              <li>在資料庫右上角「...」 → 「Add connections」加入您的 Integration。</li>
-              <li>從資料庫連結中取得 ID（32 位元字串）。</li>
+              <li>複製 <span className="bg-white px-1 rounded border border-indigo-100 italic">Internal Integration Token</span> (通常以 secret_ 開頭)。</li>
+              <li>在 Notion 中建立一個具備 <span className="font-bold italic">Name, Amount (Number), Category (Select), Date</span> 屬性的資料庫。</li>
+              <li>在資料庫右上角「...」 → 「Add connections」搜尋並加入您的 Integration。</li>
+              <li>點擊網頁版資料庫「Copy link」，ID 位於域名後、問號前：<br/><span className="text-[10px] font-mono bg-indigo-100/50 px-1 italic">...notion.so/<b>[32_CHAR_ID]</b>?v=...</span><br/>(注意：ID 是一串長度為 32 的字母與數字組成)</li>
             </ol>
           </div>
         </div>
